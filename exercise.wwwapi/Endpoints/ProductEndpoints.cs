@@ -17,7 +17,6 @@ namespace exercise.wwwapi.Endpoints
             app.MapPost("/", AddProduct); // endpoint for adding a product to the database
             app.MapDelete("/{id}", DeleteProduct); // endpoint for deleting a spesific product
             app.MapPut("/{id}", UpdateProduct); // endpoint for updating a spesific product
-
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -35,24 +34,7 @@ namespace exercise.wwwapi.Endpoints
         {
             var products = await repository.GetAsync(category);
             if (!products.Any()) return TypedResults.NotFound($"No products of the provided category {category} was found.");
-            return TypedResults.Ok(products); // sends back the products either from a category or all products
-        }
-
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public static async Task<IResult> AddProduct(IProductRepository repository, ProductPost model)
-        {
-            Product entity = new Product();
-            entity.Category = model.Category; // many products can have the same category so no need to check if the category is already in the database
-            // check if the value the client provided for price is an integer
-            entity.Price = model.Price; // price is an integer so no need to check if the value is an integer
-            // check if the string the client provided for name not already exists in the database
-            entity.Name = model.Name; // name is a string so no need to check if the value is a string
-
-            await repository.AddAsync(entity); // add the new product to the repository
-
-            // send back the url of the product just created
-            return TypedResults.Created($"https://localhost:7188/products/{entity.Id}", new { ProductName = model.Name, ProductCategory = model.Category, ProductPrice = model.Price });
+            return TypedResults.Ok(products); // sends back the products either from a category or all products if no category is provided and the products list is not empty
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -62,6 +44,32 @@ namespace exercise.wwwapi.Endpoints
             var product = await repository.DeleteAsync(id);
             if (product == null) return TypedResults.NotFound($"Product with ID {id} not found.");
             return TypedResults.Ok(product);
+        }
+
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public static async Task<IResult> AddProduct(IProductRepository repository, ProductPost model)
+        {
+            // check if the string the client provided for name doesn`t already exists in the database
+            var existingsProduct = await repository.GetAsync(null); // no category provided, so we check all products if the name already exists
+            if (existingsProduct.Any(p => p.Name.Equals(model.Name, StringComparison.OrdinalIgnoreCase)))
+            {
+                return TypedResults.BadRequest($"Product with name {model.Name} already exists");
+            }
+
+            // check if the value the client provided for price is an integer
+           
+
+            Product entity = new Product(); // create a new product entity to add to the database
+            entity.Category = model.Category; // many products can have the same category so no need to check if the category is already in the database
+            entity.Name = model.Name; 
+            entity.Price = model.Price; // set the price of the product
+
+
+            await repository.AddAsync(entity); // add the new product to the repository
+
+            // send back the url of the product just created
+            return TypedResults.Created($"https://localhost:7188/products/{entity.Id}", new { ProductName = model.Name, ProductCategory = model.Category, ProductPrice = model.Price });
         }
 
         [ProducesResponseType(StatusCodes.Status201Created)]
