@@ -117,7 +117,7 @@ namespace exercise.wwwapi.Endpoints
             if (model.Category != null) { existingProduct.Category = model.Category; }
             if (model.Price != null) { existingProduct.Price = model.Price.Value; }
 
-            var updatedProduct = await repository.UpdateAsync(id, existingProduct);
+            var updatedProduct = await repository.UpdateAsync(id, existingProduct); // sends the updated product object to your repository method.
 
             // send the updated product back as a response to client
             return TypedResults.Created($"https://localhost:7188/products/{updatedProduct.Id}", new { ProductName = model.Name, ProductCategory = model.Category, ProductPrice = model.Price });

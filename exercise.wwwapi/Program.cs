@@ -6,9 +6,9 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi(); // Adds OpenAPI/Swagger support so you get interactive API documentation.
-builder.Services.AddScoped<IProductRepository, ProductRepository>(); // Registers your Repository class as the implementation for the IRepository interface.
-builder.Services.AddDbContext<DataContext>(options => options.UseInMemoryDatabase("bandsdb")); // sets up the database
+builder.Services.AddOpenApi(); // Adds OpenAPI/Swagger support so we get interactive API documentation.
+builder.Services.AddScoped<IProductRepository, ProductRepository>(); // Registers the Repository class as the implementation for the IRepository interface.
+builder.Services.AddDbContext<DataContext>(options => options.UseInMemoryDatabase("bandsdb")); // Sets up the database
 
 var app = builder.Build(); // Builds the web application using the settings and services you just configured.
 

@@ -12,12 +12,12 @@ namespace exercise.wwwapi.Repository
             _db = db;
         }
 
-        public async Task<List<Product>> GetAsync(string? category = null)
+        public async Task<List<Product>> GetAsync(string? category)
         {
             if (string.IsNullOrWhiteSpace(category))
                 return await _db.Products.ToListAsync(); // if no category is provided we return all products from the database
 
-            return await _db.Products // if a category is provided we only get products within that category
+            return await _db.Products // if a category is provided we only return products within that category
                 .Where(p => p.Category != null && p.Category.Equals(category, StringComparison.OrdinalIgnoreCase)) // OrdinalIgnoreCase is used to ignore case sensitivity
                 .ToListAsync();
         }
@@ -40,7 +40,7 @@ namespace exercise.wwwapi.Repository
         {
             await _db.Products.AddAsync(model); // Adds a new product to the database
             await _db.SaveChangesAsync(); // Saves changes to the database
-            return model; // Returns the added product
+            return model; // Sends back the added product as a response to the client
         }
 
         public async Task<Product> UpdateAsync(int id, Product model)
@@ -51,7 +51,7 @@ namespace exercise.wwwapi.Repository
             targetProduct.Price = model.Price; // Updates the product's price
 
             await _db.SaveChangesAsync(); // Saves changes to the database asynchronously
-            return targetProduct; // Returns the updated product
+            return targetProduct; // Sends back the added product as a response to the client
         }
     }
 }
