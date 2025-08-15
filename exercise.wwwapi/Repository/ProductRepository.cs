@@ -27,13 +27,6 @@ namespace exercise.wwwapi.Repository
             return await _db.Products.FindAsync(id); // Retrieves a product by its ID from the database
         }
 
-        public async Task<Product> AddAsync(Product model)
-        {
-            await _db.Products.AddAsync(model); // Adds a new product to the database
-            await _db.SaveChangesAsync(); // Saves changes to the database
-            return model; // Returns the added product
-        }
-
         public async Task<Product> DeleteAsync(int id)
         {
             var targetProduct = await _db.Products.FindAsync(id);
@@ -41,6 +34,13 @@ namespace exercise.wwwapi.Repository
             _db.Products.Remove(targetProduct);
             await _db.SaveChangesAsync(); // Saves changes to the database asynchronously
             return targetProduct;
+        }
+
+        public async Task<Product> AddAsync(Product model)
+        {
+            await _db.Products.AddAsync(model); // Adds a new product to the database
+            await _db.SaveChangesAsync(); // Saves changes to the database
+            return model; // Returns the added product
         }
 
         public async Task<Product> UpdateAsync(int id, Product model)

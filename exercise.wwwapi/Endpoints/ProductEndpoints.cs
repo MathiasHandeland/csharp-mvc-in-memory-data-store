@@ -80,9 +80,12 @@ namespace exercise.wwwapi.Endpoints
         }
 
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public static async Task<IResult> UpdateProduct(IProductRepository repository, ProductPut model, int id)
         {
             Product existingProduct = await repository.GetByIdAsync(id);
+            if (existingProduct == null) return TypedResults.NotFound($"Product with ID {id} not found.");
+            
             // update the existing product with the new values from the model the client sent
             if (model.Name != null) { existingProduct.Name = model.Name; }
             if (model.Category != null) { existingProduct.Category = model.Category; }
@@ -90,7 +93,8 @@ namespace exercise.wwwapi.Endpoints
 
             var updatedProduct = await repository.UpdateAsync(id, existingProduct);
 
-            return TypedResults.Ok(updatedProduct); // send the updated product back as a response to client
+            // send the updated product back as a response to client
+            return TypedResults.Created($"https://localhost:7188/products/{updatedProduct.Id}", new { ProductName = model.Name, ProductCategory = model.Category, ProductPrice = model.Price });
         }
     }
 }
