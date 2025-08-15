@@ -33,7 +33,14 @@ namespace exercise.wwwapi.Endpoints
         public static async Task<IResult> GetProducts(IProductRepository repository, [FromQuery] string? category)
         {
             var products = await repository.GetAsync(category);
-            if (!products.Any()) return TypedResults.NotFound($"No products of the provided category {category} was found.");
+            if (!products.Any())
+            {
+                if (!string.IsNullOrWhiteSpace(category))
+                    return TypedResults.NotFound($"No products of the provided category {category} was found.");
+                else
+                    return TypedResults.NotFound("No products found.");
+            }
+
             return TypedResults.Ok(products); // sends back the products either from a category or all products if no category is provided and the products list is not empty
         }
 
@@ -57,7 +64,7 @@ namespace exercise.wwwapi.Endpoints
                 return TypedResults.BadRequest($"Product with name {model.Name} already exists");
             }
 
-            // check if the value the client provided for price is an integer
+            // TODO check if the value the client provided for price is an integer
            
 
             Product entity = new Product(); // create a new product entity to add to the database
