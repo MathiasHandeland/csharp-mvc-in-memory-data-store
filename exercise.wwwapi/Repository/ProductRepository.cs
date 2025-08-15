@@ -32,6 +32,7 @@ namespace exercise.wwwapi.Repository
         public async Task<Product> DeleteAsync(int id)
         {
             var targetProduct = await _db.Products.FindAsync(id);
+            if (targetProduct == null) return null; // Returns null if the product is not found
             _db.Products.Remove(targetProduct);
             await _db.SaveChangesAsync(); // Saves changes to the database asynchronously
             return targetProduct;
