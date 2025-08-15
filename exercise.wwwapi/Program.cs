@@ -1,20 +1,30 @@
+using exercise.wwwapi.Data;
+using exercise.wwwapi.Endpoints;
+using exercise.wwwapi.Repository;
+using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddOpenApi(); // Adds OpenAPI/Swagger support so you get interactive API documentation.
+builder.Services.AddScoped<IProductRepository, ProductRepository>(); // Registers your Repository class as the implementation for the IRepository interface.
+builder.Services.AddDbContext<DataContext>(options => options.UseInMemoryDatabase("bandsdb")); // sets up the database
 
-var app = builder.Build();
+var app = builder.Build(); // Builds the web application using the settings and services you just configured.
 
-// Configure the HTTP request pipeline.
+// In development, enables OpenAPI endpoints and Swagger UI for interactive API docs        
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/openapi/v1.json", "Demo API");
+    });
+    app.MapScalarApiReference();
 }
 
-app.UseHttpsRedirection();
+app.UseHttpsRedirection(); // Redirects all HTTP requests to HTTPS for security.
 
-app.Run();
+app.ConfigureProduct(); // Activates the product-related API endpoints by calling extension methods that set up the routes.
 
+app.Run(); // Starts the web application and begins listening for requests.
