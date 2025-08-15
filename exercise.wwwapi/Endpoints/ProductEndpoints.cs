@@ -27,7 +27,6 @@ namespace exercise.wwwapi.Endpoints
             var product = await repository.GetByIdAsync(id);
             if (product == null) return TypedResults.NotFound($"Product with ID {id} not found.");
             return TypedResults.Ok(product); // send the product back as a response to client
-
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -39,14 +38,17 @@ namespace exercise.wwwapi.Endpoints
         }
 
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public static async Task<IResult> AddProduct(IProductRepository repository, ProductPost model)
         {
             Product entity = new Product();
-            entity.Name = model.Name;
-            entity.Category = model.Category;
-            entity.Price = model.Price;
+            entity.Category = model.Category; // many products can have the same category so no need to check if the category is already in the database
+            // check if the value the client provided for price is an integer
 
-            var result = await repository.AddAsync(entity);
+            // check if the string the client provided for name not already exists in the database
+
+
+            await repository.AddAsync(entity); // add the new product to the repository
 
             // send back the url of the product just created
             return TypedResults.Created($"https://localhost:7188/products/{entity.Id}", new { ProductName = model.Name, ProductCategory = model.Category, ProductPrice = model.Price });
