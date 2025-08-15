@@ -61,7 +61,6 @@ namespace exercise.wwwapi.Endpoints
             var product = await repository.DeleteAsync(id);
             if (product == null) return TypedResults.NotFound($"Product with ID {id} not found.");
             return TypedResults.Ok(product);
-
         }
 
         [ProducesResponseType(StatusCodes.Status201Created)]
