@@ -13,7 +13,7 @@ namespace exercise.wwwapi.Endpoints
             var group = app.MapGroup("products"); // creates a group for product endpoints
 
             app.MapGet("/{id}", GetProductById); // endpoint for requesting a product
-            app.MapGet("/", GetProducts); // endpoint for requesting all products in the database
+            app.MapGet("/", GetProducts); // endpoint for requesting all products in the database, optionally all products from a category
             app.MapPost("/", AddProduct); // endpoint for adding a product to the database
             app.MapDelete("/{id}", DeleteProduct); // endpoint for deleting a spesific product
             app.MapPut("/{id}", UpdateProduct); // endpoint for updating a spesific product
@@ -30,11 +30,12 @@ namespace exercise.wwwapi.Endpoints
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public static async Task<IResult> GetProducts(IProductRepository repository)
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public static async Task<IResult> GetProducts(IProductRepository repository, [FromQuery] string? category)
         {
-            var product = await repository.GetAsync(); // get all products from the repository
-            return TypedResults.Ok(product); // send the products back as a response to client
-
+            var products = await repository.GetAsync(category);
+            if (!products.Any()) return TypedResults.NotFound($"No products of the provided category {category} was found.");
+            return TypedResults.Ok(products); // sends back the products either from a category or all products
         }
 
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -44,9 +45,9 @@ namespace exercise.wwwapi.Endpoints
             Product entity = new Product();
             entity.Category = model.Category; // many products can have the same category so no need to check if the category is already in the database
             // check if the value the client provided for price is an integer
-
+            entity.Price = model.Price; // price is an integer so no need to check if the value is an integer
             // check if the string the client provided for name not already exists in the database
-
+            entity.Name = model.Name; // name is a string so no need to check if the value is a string
 
             await repository.AddAsync(entity); // add the new product to the repository
 

@@ -12,9 +12,14 @@ namespace exercise.wwwapi.Repository
             _db = db;
         }
 
-        public async Task<List<Product>> GetAsync()
+        public async Task<List<Product>> GetAsync(string? category = null)
         {
-            return await _db.Products.ToListAsync(); // Retrieves all products from the database
+            if (string.IsNullOrWhiteSpace(category))
+                return await _db.Products.ToListAsync(); // if no category is provided we return all products from the database
+
+            return await _db.Products // if a category is provided we only get products within that category
+                .Where(p => p.Category != null && p.Category.Equals(category, StringComparison.OrdinalIgnoreCase)) // OrdinalIgnoreCase is used to ignore case sensitivity
+                .ToListAsync();
         }
 
         public async Task<Product> GetByIdAsync(int id)
