@@ -80,7 +80,7 @@ namespace exercise.wwwapi.Endpoints
         }
 
         [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public static async Task<IResult> UpdateProduct(IProductRepository repository, ProductPut model, int id)
         {
             Product existingProduct = await repository.GetByIdAsync(id);
