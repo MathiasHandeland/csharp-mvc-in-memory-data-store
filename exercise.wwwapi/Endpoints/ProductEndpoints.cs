@@ -48,8 +48,8 @@ namespace exercise.wwwapi.Endpoints
 
             var result = await repository.AddAsync(entity);
 
-            // send back the url of the item just crated
-            return TypedResults.Created($"https://localhost:7188/products/{entity.Id}", new { ProductName = model., ProductCategory = model.Category, ProductPrice = model.Price });
+            // send back the url of the product just created
+            return TypedResults.Created($"https://localhost:7188/products/{entity.Id}", new { ProductName = model.Name, ProductCategory = model.Category, ProductPrice = model.Price });
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -62,12 +62,18 @@ namespace exercise.wwwapi.Endpoints
 
         }
 
-
-
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public static async Task<IResult> UpdateProduct(IProductRepository repository, ProductPost model)
+        public static async Task<IResult> UpdateProduct(IProductRepository repository, ProductPut model, int id)
         {
-            throw new NotImplementedException();
+            Product existingProduct = await repository.GetByIdAsync(id);
+            // update the existing product with the new values from the model the client sent
+            if (model.Name != null) { existingProduct.Name = model.Name; }
+            if (model.Category != null) { existingProduct.Category = model.Category; }
+            if (model.Price != null) { existingProduct.Price = model.Price.Value; }
+
+            var updatedProduct = await repository.UpdateAsync(id, existingProduct);
+
+            return TypedResults.Ok(updatedProduct); // send the updated product back as a response to client
         }
     }
 }

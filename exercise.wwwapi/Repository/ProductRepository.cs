@@ -39,7 +39,13 @@ namespace exercise.wwwapi.Repository
 
         public async Task<Product> UpdateAsync(int id, Product model)
         {
-            throw new NotImplementedException();
+            var targetProduct = await _db.Products.FindAsync(id);
+            targetProduct.Name = model.Name; // Updates the product's name
+            targetProduct.Category = model.Category; // Updates the product's category
+            targetProduct.Price = model.Price; // Updates the product's price
+
+            await _db.SaveChangesAsync(); // Saves changes to the database asynchronously
+            return targetProduct; // Returns the updated product
         }
     }
 }

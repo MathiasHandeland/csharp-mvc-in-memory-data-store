@@ -6,7 +6,5 @@
         public string Name { get; set; }
         public string Category { get; set; }
         public int Price { get; set; }
-
-        public int? Id { get; set; } // not required but optional
     }
 }
